@@ -17,15 +17,25 @@ class ContactsView(APIView):
             serializer = ContactSerializer(contacts, many=True)
             return Response(serializer.data)
         
-    def post(self, request):
+    def post(self, request, contact_id=None):
             
-        serializer = ContactSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        if contact_id is not None:    
+            contact = Contact.objects.get(id=contact_id)
+            serializer = ContactSerializer(data=request.data)
+            if serializer.is_valid():
+                contact.first_name = request.data.get("first_name")
+                contact.last_name = request.data.get("last_name")
+                contact.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                  
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
+            serializer = ContactSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)            
         
     def delete(self, request, contact_id):
         
