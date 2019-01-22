@@ -17,10 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, re_path, include
 from rest_framework_jwt.views import obtain_jwt_token
+from demo import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     #re_path(r'^auth/', include('rest_framework_social_oauth2.urls')),  
     re_path(r'^api-token-auth/', obtain_jwt_token),
+    path('', views.homepage, name='home'),
 ]
